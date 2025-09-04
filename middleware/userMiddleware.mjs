@@ -34,10 +34,12 @@ const checkUser = [
     }
 
     const { email, password } = request.body;
+    console.log("登录内容", request.body);
+
     try {
       const user = await UserModel.findOne({
-        email: email,
-        password: password,
+        email,
+        password,
       });
       if (!user) {
         logger.error("用户未找到", { email });
