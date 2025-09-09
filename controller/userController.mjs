@@ -8,7 +8,7 @@ export const userLogin = async (request, response) => {
   //拿到request里的email和password（中间件已经封装到request.userMessage里） 到数据库里找user 找到后返回token，以便其他请求，
   const { userMessage } = request;
   try {
-    const token = await generateJWT(userMessage, "1h");
+    const token = await generateJWT(userMessage, "24h");
     return response.status(201).json({ token });
   } catch (error) {
     logger.error(error);

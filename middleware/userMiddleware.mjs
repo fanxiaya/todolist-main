@@ -26,15 +26,17 @@ const checkUser = [
           return response.status(201).send({ message: "用户已登录" });
         }
       } catch (error) {
+        if (error.code === "ERR_JWT_EXPIRED") {
+          return response.status(401).json({ message: "token过期,重新登录" });
+        }
         logger.error({ error }, "登录时携带的token验证失败");
         return response
           .status(400)
-          .json({ message: "登录时携带的token验证失败" });
+          .json({ message: "token验证失败,user身份信息不匹配" });
       }
     }
 
     const { email, password } = request.body;
-    console.log("登录内容", request.body);
 
     try {
       const user = await UserModel.findOne({
@@ -42,13 +44,13 @@ const checkUser = [
         password,
       });
       if (!user) {
-        logger.error("用户未找到", { email });
-        return response.status(400).send("没找到对应的注册用户！");
+        logger.error({ email }, "没找到对应的注册用户");
+        return response.status(400).json({ message: "没找到对应的注册用户！" });
       }
       request.userMessage = { email, password };
     } catch (error) {
       logger.error({ error }, "查找user时出现错误");
-      return response.status(400).send("没找到对应的注册用户！");
+      return response.status(400).json({ message: "查找user时出现错误" });
     }
 
     next();
